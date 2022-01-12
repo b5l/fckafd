@@ -1,0 +1,6 @@
+.idea/
+dist/
+posts/
+node_modules/
+cookies.txt
+credentials.json

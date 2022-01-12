@@ -1,0 +1,17 @@
+{
+   "type": "sqlite",
+   "database": "database.sqlite",
+   "synchronize": true,
+   "logging": true,
+   "migrate": true,
+   "entities": [
+      "dist/db/entity/**/*.js"
+   ],
+   "migrations": [
+      "dist/db/migration/**/*.js"
+   ],
+   "cli": {
+      "entitiesDir": "dist/db/entity",
+      "migrationsDir": "dist/db/migration"
+   }
+}
