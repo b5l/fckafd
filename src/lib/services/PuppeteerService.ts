@@ -112,6 +112,18 @@ export default class PuppeteerService {
         return posts;
     }
 
+    async checkPostDeleted(facebookPost: FacebookPost): Promise<boolean> {
+        const page = await this.browser.newPage();
+        await page.goto(facebookPost.url);
+        await page.waitForNetworkIdle();
+        await this.loginIfNeeded(page);
+
+        // This button only appears when you navigate to a deleted post
+        const goBackToNewsFeedButton = await page.$('a[aria-label="Go to News Feed"][href="/"][role="link"]');
+        await page.close();
+        return !!goBackToNewsFeedButton;
+    }
+
     // private functions
     private async loadCookies() {
         try {

@@ -30,6 +30,7 @@ export default class FacebookPostService {
         const dbPost = await this.getPost(post.facebookPage.pageId, post.identifier);
         if (dbPost) return;
 
+        console.log(`    - Screenshotting ${post.url}`);
         const screenshot = await this.puppeteerService.screenshotPost(post.url);
         const filePath = _getScreenshotLocationForPost(post);
         const baseDir = path.dirname(filePath);
@@ -47,19 +48,14 @@ export default class FacebookPostService {
         await this.repository.update({ id: post.id }, { deleted: true });
     }
 
-    async checkStillExists(post: FacebookPost) {
-        const response = await fetch(post.url, { method: 'HEAD' });
-        return response.status === 200;
-    }
-
     async getRecentPosts() {
         const oldestPostDate = new Date();
         oldestPostDate.setDate(oldestPostDate.getDate() - MAX_POST_AGE_IN_DAYS);
-        console.log(oldestPostDate);
         return this.repository.find({
             where: {
                 createdAt: MoreThan(format(oldestPostDate, 'yyyy-MM-dd kk:mm:ss.SSS'))
-            }
+            },
+            relations: ['facebookPage']
         })
     }
 
@@ -91,6 +87,6 @@ function _getScreenshotLocationForPost(post: FacebookPost, subDir: string = 'act
     return path.join(
         POST_IMG_ROOT_DIR,
         subDir,
-        `./${post.facebookPage.pageId}/${Date.now()}-${post.identifier}.png`
+        `./${post.facebookPage.pageId}/${post.identifier}.png`
     );
 }

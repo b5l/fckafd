@@ -28,28 +28,32 @@ export default class SchedulerService {
 
     private async _runJob() {
         // Screenshot everything new
+        console.log('Scraping Facebook pages')
         const facebookPages = await this.facebookPageService.getAllPages();
         for (const facebookPage of facebookPages) {
+            console.log(`  - Fetching posts for ${facebookPage.pageId}`)
             try {
                 const latestPosts = await this.puppeteerService.getLatestPosts(facebookPage);
                 for (const post of latestPosts) {
                     try {
                         await this.facebookPostService.screenshotPostAndPersist(post);
                     } catch (err) {
-                        console.error(`Error screenshotting ${post.url}`, err);
+                        console.error(`!! Error screenshotting ${post.url}`, err);
                         // ignore so it still goes on with the other posts
                     }
                 }
             } catch (err) {
-                console.error(`Error getting posts of ${facebookPage.pageId}`, err);
+                console.error(`!! Error getting posts of ${facebookPage.pageId}`, err);
                 // ignore so it still goes on with the other pages
             }
         }
 
         // Check for deletion
+        console.log('Checking post deletion statuses')
         const recentPosts = await this.facebookPostService.getRecentPosts();
         for (const post of recentPosts) {
-            if (!await this.facebookPostService.checkStillExists(post)) {
+            if (await this.puppeteerService.checkPostDeleted(post)) {
+                console.log(`  - Deleted post found! ${post.url}`)
                 await this.facebookPostService.markDeleted(post);
             }
         }
