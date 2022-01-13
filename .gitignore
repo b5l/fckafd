@@ -4,3 +4,4 @@ posts/
 node_modules/
 cookies.txt
 credentials.json
+database.sqlite
