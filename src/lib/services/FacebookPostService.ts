@@ -42,6 +42,7 @@ export default class FacebookPostService {
     async markDeleted(post: FacebookPost) {
         const oldPath = _getScreenshotLocationForPost(post, 'active');
         const newPath = _getScreenshotLocationForPost(post, 'deleted');
+        await fs.promises.mkdir(path.dirname(newPath), { recursive: true });
         await fs.promises.rename(oldPath, newPath);
         await this.repository.update({ id: post.id }, { deleted: true });
     }
