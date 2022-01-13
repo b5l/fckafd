@@ -51,15 +51,26 @@ export default class PuppeteerService {
         }
 
         let screenshottedElem = watchFeedElem || postElem;
-        const { top, left, width, height } = await screenshottedElem.evaluate(elem => {
-            const boundingClientRect = elem.getBoundingClientRect();
-            return {
-                top: boundingClientRect.top + window.scrollY,
-                left: boundingClientRect.left + window.scrollX,
-                width: boundingClientRect.width,
-                height: boundingClientRect.height
-            };
-        });
+        let top, left, width, height;
+        if (screenshottedElem) {
+            ({ top, left, width, height } = await screenshottedElem.evaluate(elem => {
+                const boundingClientRect = elem.getBoundingClientRect();
+                return {
+                    top: boundingClientRect.top + window.scrollY,
+                    left: boundingClientRect.left + window.scrollX,
+                    width: boundingClientRect.width,
+                    height: boundingClientRect.height,
+                };
+            }));
+        } else {
+            console.error(`Could not screenshot element for ${url}! Taking picture of whole viewport...`);
+            ({ top, left, width, height } = {
+                top: 0,
+                left: 0,
+                width: page.viewport().width,
+                height: page.viewport().height,
+            });
+        }
 
         const screenshot = await page.screenshot({
             captureBeyondViewport: true,
