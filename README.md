@@ -27,6 +27,9 @@ linux@linux:~/Code/fckafd$ # Our scraper needs a valid Facebook login. Sorry abo
 linux@linux:~/Code/fckafd$ cp credentials.json.tpl credentials.json
 linux@linux:~/Code/fckafd$ vim credentials.json
 
+linux@linux:~/Code/fckafd$ # Run migrations
+linux@linux:~/Code/fckafd$ npm run migrate
+
 linux@linux:~/Code/fckafd$ # Add a Facebook page to regularly check (pageId is the part right after https://facebook.com/ in the URL)
 linux@linux:~/Code/fckafd$ npx typeorm query 'insert into facebook_page (pageId) values ("pageId")'
 
