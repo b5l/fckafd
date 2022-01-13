@@ -30,9 +30,19 @@ export default class SchedulerService {
         // Screenshot everything new
         const facebookPages = await this.facebookPageService.getAllPages();
         for (const facebookPage of facebookPages) {
-            const latestPosts = await this.puppeteerService.getLatestPosts(facebookPage);
-            for (const post of latestPosts) {
-                await this.facebookPostService.screenshotPostAndPersist(post);
+            try {
+                const latestPosts = await this.puppeteerService.getLatestPosts(facebookPage);
+                for (const post of latestPosts) {
+                    try {
+                        await this.facebookPostService.screenshotPostAndPersist(post);
+                    } catch (err) {
+                        console.error(`Error screenshotting ${post.url}`, err);
+                        // ignore so it still goes on with the other posts
+                    }
+                }
+            } catch (err) {
+                console.error(`Error getting posts of ${facebookPage.pageId}`, err);
+                // ignore so it still goes on with the other pages
             }
         }
 
